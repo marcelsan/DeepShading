@@ -6,12 +6,12 @@ Final project for IN1164 Deep Learning. <br />
 Our project is based on Nalbach et al. 2017 <a href="http://deep-shading-datasets.mpi-inf.mpg.de/">paper</a>. In this project,
 a set of buffers are provided to a Deep Convolutional Network in order to synthetize differend shading effects (such as Ambient Occlusion,
 Depth of Field, Global Illumination and Sub-surface Scattering). The set of buffers depends os the shading effect we want to synthetize.
-<br />
-Input Bufers: <br />
+<br /><br />
+<b>Input Bufers:</b> <br />
 <img src='notebooks/normal_input.png' />
 <img src='notebooks/position_input.png' /> <br />
 
-Result (Ambient Occlusion): <br />
+<b>Result (Ambient Occlusion):</b> <br />
 <img src='notebooks/test_output.png' />
 
 

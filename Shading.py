@@ -19,9 +19,8 @@ model = ShadingNet()
 model.summary()
 
 # The compile step specifies the training configuration.
-model.compile(optimizer=tf.train.AdamOptimizer(0.0001),
-              loss='mean_absolute_error',
-              metrics=['accuracy'])
+model.compile(optimizer=tf.train.AdamOptimizer(0.00009),
+              loss='mean_absolute_error')
 
 # Initilize the data.
 featdef = { 'input': tf.FixedLenFeature(shape=[], dtype=tf.string),
@@ -56,14 +55,14 @@ callbacks = [
 ]
 
 # Fit the model.
-history = model.fit(ds_train, epochs=35, steps_per_epoch=500, 
+history = model.fit(ds_train, epochs=45, steps_per_epoch=500, 
                     validation_data=ds_validation, validation_steps=15, 
                     callbacks=callbacks)
 
 # Save the model.
 # Serialize model to JSON
 model_json = model.to_json()
-with open("./models/model.json", "w") as json_file:
+with open("./models/model_%s.json"  % (time_now), "w") as json_file:
     json_file.write(model_json)
 
 # Save weights.

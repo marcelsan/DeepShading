@@ -30,7 +30,7 @@ Depth of Field, Global Illumination and Sub-surface Scattering). The set of buff
 4)Generate the .tfrecord for trainning and validation (Use the DataReader.py)<br>
 5)Run "Shading.py"
 
-## Refeences
+## References
 [1]  Oliver Nalbach, Elena Arabadzhiyska, Dushyant Mehta, Hans-Peter Seidel, Tobias Ritschel
 Deep Shading: Convolutional Neural Networks for Screen-Space Shading
 to appear in Proc. EGSR 2017

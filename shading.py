@@ -3,27 +3,25 @@ import datetime
 
 import numpy as np
 import tensorflow as tf
+
+from initialize import FLAGS
+from losses import perceptual_loss, l1_loss
+from models.shading_net import ShadingNet
 from tensorflow import keras
 
-from models.shading_net import ShadingNet
-
-# ToDO: store all the hyperparameters to a file
-IM_SIZE = 512
-
-parser = argparse.ArgumentParser(description='')
-parser.add_argument('-train_set', help='Train tfrecord.', required=True)
-parser.add_argument('-val_set', help='Validation tfrecord.', required=True)
-args = parser.parse_args()
+train_set = '/media/marcelsantos/DATA/DeepShadingDataBase/train_512.tfrecord'
+val_set = '/media/marcelsantos/DATA/DeepShadingDataBase/validation_512.tfrecord'
 
 model = ShadingNet()
 model.summary()
 
-# The compile step specifies the training configuration.
-lr = 0.00009
-loss_function = 'mean_absolute_error'
-model.compile(optimizer=tf.train.AdamOptimizer(lr), loss=loss_function)
+#=== Loss function formulation =================================================
+lr = FLAGS.learningRate
+loss_function = 'perceptual_loss'
 
-# Initilize the data.
+model.compile(optimizer=tf.train.AdamOptimizer(lr), loss=l1_loss)
+
+#=== Setup Data ================================================
 featdef = { 'input': tf.FixedLenFeature(shape=[], dtype=tf.string),
            'ground_truth': tf.FixedLenFeature(shape=[], dtype=tf.string)}
           
@@ -31,18 +29,20 @@ def _parse_record(example_proto, clip=False):
     """Parse a single record into image, weather labels, ground labels"""
     example = tf.parse_single_example(example_proto, featdef)
     im = tf.decode_raw(example['input'], tf.float32)
-    im = tf.reshape(im, (IM_SIZE, IM_SIZE, 6))
+    im = tf.reshape(im, (FLAGS.imSize, FLAGS.imSize, 6))
     gt = tf.decode_raw(example['ground_truth'], tf.float32)
-    gt = tf.reshape(gt, (IM_SIZE, IM_SIZE, 1))
+    gt = tf.reshape(gt, (FLAGS.imSize, FLAGS.imSize, 1))
 
     return im, gt
 
 # Construct a TFRecordDataset.
-ds_train = tf.data.TFRecordDataset(args.train_set).map(_parse_record)
+ds_train = tf.data.TFRecordDataset(train_set).map(_parse_record)
 ds_train = ds_train.shuffle(1000).batch(16).repeat()
 
-ds_validation = tf.data.TFRecordDataset(args.val_set).map(_parse_record)
+ds_validation = tf.data.TFRecordDataset(val_set).map(_parse_record)
 ds_validation = ds_validation.batch(8).repeat()
+
+#=== Run training loop ============================================================
 
 # Define the callbacks.
 time_now = datetime.datetime.now()
@@ -54,9 +54,11 @@ callbacks = [
 ]
 
 # Fit the model.
-history = model.fit(ds_train, epochs=45, steps_per_epoch=500, 
+history = model.fit(ds_train, epochs=40, steps_per_epoch=500, 
                     validation_data=ds_validation, validation_steps=15, 
                     callbacks=callbacks)
+
+#=== Shut down ===================================================================
 
 # Save the model.
 model_json = model.to_json()

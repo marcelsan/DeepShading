@@ -22,8 +22,8 @@ shading_net.trainable=False
 compositor_net = ScaleWeightPredictor()
 
 input_image = keras.Input(shape=(512, 512, 6))
-down_level_1 = keras.layers.AveragePooling2D()(input_image)
-down_level_2 = keras.layers.AveragePooling2D()(down_level_1)
+down_level_1 = keras.layers.MaxPooling2D((2, 2))(input_image)
+down_level_2 = keras.layers.MaxPooling2D((2, 2))(down_level_1)
 
 shading_level_0 = shading_net(input_image)
 shading_level_1 = shading_net(down_level_1)
@@ -38,10 +38,9 @@ model = keras.Model(input_image, final)
 model.summary()
 
 # Compile the model.
-model.compile(optimizer=tf.train.AdamOptimizer(0.00007),
-              loss='mean_absolute_error',
-              metrics=['accuracy'])
-
+lr = 0.00003
+loss_function = 'mean_squared_error'
+model.compile(optimizer=tf.train.AdamOptimizer(lr), loss=loss_function)
 
 # Initilize the data.
 featdef = { 'input': tf.FixedLenFeature(shape=[], dtype=tf.string),
@@ -67,12 +66,14 @@ ds_validation = ds_validation.batch(4).repeat()
 # Define the callbacks.
 time_now = datetime.datetime.now()
 
+output_file_name = 'multiscale__lr_%s__loss_%s__%s' % (lr, loss_function, time_now)
+
 callbacks = [
   # Write TensorBoard logs to `./logs` directory.
   tf.keras.callbacks.TensorBoard(log_dir='./tensorboard'),
 
   # Write log on CSV.
-  tf.keras.callbacks.CSVLogger('./logs/training_%s.log' % (time_now)),
+  tf.keras.callbacks.CSVLogger('./logs/%s_training.log' % (output_file_name))
 ]
 
 # Fit the model.
@@ -82,8 +83,8 @@ history = model.fit(ds_train, epochs=10, steps_per_epoch=500,
 
 # Save weights.
 model_json = model.to_json()
-with open("./models/model_multiscale.json", "w") as json_file:
+with open("./models/%s_model.json" % (output_file_name) , "w") as json_file:
     json_file.write(model_json)
 
-model.save('./models/model_multiscale_%s.h5' % (time_now))
+model.save('./models/%s_model.h5' % (output_file_name))
 print('[INFO] Model saved.')

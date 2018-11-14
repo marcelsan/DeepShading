@@ -57,6 +57,7 @@ def ShadingNet(input_shape=(None, None, 6), weights_dir=None):
 
 	up_level_1_to_0 = keras.layers.Conv2DTranspose(16, (4, 4), strides=2, padding='SAME')(up_level_1_conv) # 512
 	up_concat_level_0 = keras.layers.Concatenate()([down_level_0_conv, up_level_1_to_0])
+	
 	up_level_0_conv = keras.layers.Conv2D(1, (3, 3), strides=1, padding='SAME', activation='relu')(up_concat_level_0)
 	up_level_0_conv = keras.layers.LeakyReLU(0.01)(up_level_0_conv)
 

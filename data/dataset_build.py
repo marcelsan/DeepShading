@@ -70,10 +70,13 @@ for i, (gt_img, feats) in enumerate(images):
 
     gt = pyexr.read_all(gt_img)['default'][:,:,0:1]
     input_image = np.dstack([pyexr.read_all(f)['default'][:,:,0:3] for f in feats])
-    
-    example = tf.train.Example(features=tf.train.Features(feature={'input': _bytes_feature(input_image.tostring()),
+
+    if (gt.shape[0] == gt.shape[1] == input_image.shape[0] == input_image.shape[1] == IM_SIZE):
+        example = tf.train.Example(features=tf.train.Features(feature={'input': _bytes_feature(input_image.tostring()),
                                                                   'ground_truth': _bytes_feature(gt.tostring())}))
-    
+    else:
+        print('[ERROR] Shape error.')
+
     writer.write(example.SerializeToString())
 
 print('[INFO] Done!')  

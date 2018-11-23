@@ -5,23 +5,20 @@ import numpy as np
 import tensorflow as tf
 
 from initialize import FLAGS
-from losses import perceptual_loss, l1_loss
+from losses import perceptual_loss, l1_loss, l2_loss
 from models.shading_net import ShadingNet
+from models.res_shading_net import ResShadingNet
 from tensorflow import keras
 
-train_set = '/media/marcelsantos/DATA/DeepShadingDataBase/train_512.tfrecord'
-val_set = '/media/marcelsantos/DATA/DeepShadingDataBase/validation_512.tfrecord'
+lr = FLAGS.learningRate
+loss_function = 'l2_loss'
 
+#=== Load and compile model ====================================================
 model = ShadingNet()
 model.summary()
+model.compile(optimizer=tf.train.AdamOptimizer(lr), loss=l2_loss)
 
-#=== Loss function formulation =================================================
-lr = FLAGS.learningRate
-loss_function = 'perceptual_loss'
-
-model.compile(optimizer=tf.train.AdamOptimizer(lr), loss=l1_loss)
-
-#=== Setup Data ================================================
+#=== Setup Data =================================================================
 featdef = { 'input': tf.FixedLenFeature(shape=[], dtype=tf.string),
            'ground_truth': tf.FixedLenFeature(shape=[], dtype=tf.string)}
           
@@ -36,17 +33,17 @@ def _parse_record(example_proto, clip=False):
     return im, gt
 
 # Construct a TFRecordDataset.
-ds_train = tf.data.TFRecordDataset(train_set).map(_parse_record)
-ds_train = ds_train.shuffle(1000).batch(16).repeat()
+ds_train = tf.data.TFRecordDataset(FLAGS.trainSetDir).map(_parse_record)
+ds_train = ds_train.batch(16).repeat()
 
-ds_validation = tf.data.TFRecordDataset(val_set).map(_parse_record)
+ds_validation = tf.data.TFRecordDataset(FLAGS.valSetDir).map(_parse_record)
 ds_validation = ds_validation.batch(8).repeat()
 
 #=== Run training loop ============================================================
 
 # Define the callbacks.
 time_now = datetime.datetime.now()
-output_file_name = 'shading__lr_%s__loss_%s__%s' % (lr, loss_function, time_now)
+output_file_name = 'deep_shading_batch_normalization_full__epochs_%d__lr_%s__loss_%s__%s' % (FLAGS.epochs, lr, loss_function, time_now)
 
 callbacks = [
   # Write log on CSV.
@@ -54,8 +51,8 @@ callbacks = [
 ]
 
 # Fit the model.
-history = model.fit(ds_train, epochs=40, steps_per_epoch=500, 
-                    validation_data=ds_validation, validation_steps=15, 
+history = model.fit(ds_train, epochs=FLAGS.epochs, steps_per_epoch=3000, 
+                    validation_data=ds_validation, validation_steps=250, 
                     callbacks=callbacks)
 
 #=== Shut down ===================================================================

@@ -24,11 +24,11 @@ Depth of Field, Global Illumination and Sub-surface Scattering). The set of buff
 5. <a href="https://github.com/tvogels/pyexr">pyexr</a>
 
 ## Steps to run the repo 
-1)Clone the repo<br>
-2)Download the dataset (http://deep-shading-datasets.mpi-inf.mpg.de/)<br>
-3)Install the requirements<br>
-4)Generate the .tfrecord for trainning and validation (Use the DataReader.py)<br>
-5)Run "Shading.py"
+1) Clone the repo<br>
+2) Download the dataset (http://deep-shading-datasets.mpi-inf.mpg.de/)<br>
+3) Install the requirements<br>
+4) Generate the .tfrecord for trainning and validation (Use the DataReader.py)<br>
+5) Run "Shading.py"
 
 ## References
 [1]  Oliver Nalbach, Elena Arabadzhiyska, Dushyant Mehta, Hans-Peter Seidel, Tobias Ritschel

@@ -5,9 +5,8 @@ import numpy as np
 import tensorflow as tf
 
 from initialize import FLAGS
-from losses import perceptual_loss, l1_loss, l2_loss
+from losses import l1_loss, l2_loss
 from models.shading_net import ShadingNet
-from models.res_shading_net import ResShadingNet
 from tensorflow import keras
 
 lr = FLAGS.learningRate

@@ -1,7 +1,5 @@
 # Deep Shading
 
-Final project for IN1164 Deep Learning. <br />
-
 ## Convolutional Neural Networks for Screen-Space Shading 
 Our project is based on Nalbach et al. 2017 <a href="http://deep-shading-datasets.mpi-inf.mpg.de/">paper</a>. In this project,
 a set of buffers are provided to a Deep Convolutional Network in order to synthetize differend shading effects (such as Ambient Occlusion,
